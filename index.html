@@ -1,57 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MemoryMaster - Start Page</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            text-align: center;
-            background-color: #f0f0f0;
-            margin: 0;
-            padding: 0;
-        }
-        h1 {
-            color: #4CAF50;
-            margin-top: 100px;
-        }
-        .container {
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
-        .start-btn {
-            padding: 20px 40px;
-            font-size: 18px;
-            color: #fff;
-            background-color: #4CAF50;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.3s;
-        }
-        .start-btn:hover {
-            background-color: #45a049;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MemoryMaster</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-
-    <div class="container">
-        <div>
-            <h1>Welcome to MemoryMaster</h1>
-            <p>Click the button below to start the game</p>
-            <button class="start-btn" onclick="startGame()">Start Game</button>
-        </div>
-    </div>
-
-    <script>
-        function startGame() {
-            window.location.href = "home.html"; // Replace "game.html" with the actual game page
-        }
-    </script>
-
+  <div class="container">
+    <h1 class="title">MEMORY MASTER</h1>
+    <button class="start-button" onclick="location.href='select-mode.html'">CLICK TO START</button>
+  </div>
 </body>
 </html>
