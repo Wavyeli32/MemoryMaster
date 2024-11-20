@@ -1,46 +1,170 @@
-// Variables
-const gameBoard = document.getElementById('game-board');
-const cardValues = ['A', 'B', 'C', 'D', 'A', 'B', 'C', 'D'];
-let flippedCards = [];
-let matchedPairs = 0;
-
-// Shuffle cards (simple example)
-cardValues.sort(() => 0.5 - Math.random());
-
-// Generate Cards
-cardValues.forEach(value => {
-    const card = document.createElement('div');
-    card.classList.add('card');
-    card.dataset.value = value;
-    card.addEventListener('click', flipCard);
-    gameBoard.appendChild(card);
-});
-
-// Flip Card Function
-function flipCard() {
-    const card = this;
-    card.textContent = card.dataset.value;
-    flippedCards.push(card);
-
-    if (flippedCards.length === 2) {
-        checkForMatch();
+document.addEventListener("DOMContentLoaded", () => {
+    const allPairs = {
+      "Alabama": "Montgomery",
+      "Alaska": "Juneau",
+      "Arizona": "Phoenix",
+      "Arkansas": "Little Rock",
+      "California": "Sacramento",
+      "Colorado": "Denver",
+      "Connecticut": "Hartford",
+      "Delaware": "Dover",
+      "Florida": "Tallahassee",
+      "Georgia": "Atlanta",
+      "Hawaii": "Honolulu",
+      "Idaho": "Boise",
+      "Illinois": "Springfield",
+      "Indiana": "Indianapolis",
+      "Iowa": "Des Moines",
+      "Kansas": "Topeka",
+      "Kentucky": "Frankfort",
+      "Louisiana": "Baton Rouge",
+      "Maine": "Augusta",
+      "Maryland": "Annapolis",
+      "Massachusetts": "Boston",
+      "Michigan": "Lansing",
+      "Minnesota": "Saint Paul",
+      "Mississippi": "Jackson",
+      "Missouri": "Jefferson City",
+      "Montana": "Helena",
+      "Nebraska": "Lincoln",
+      "Nevada": "Carson City",
+      "New Hampshire": "Concord",
+      "New Jersey": "Trenton",
+      "New Mexico": "Santa Fe",
+      "New York": "Albany",
+      "North Carolina": "Raleigh",
+      "North Dakota": "Bismarck",
+      "Ohio": "Columbus",
+      "Oklahoma": "Oklahoma City",
+      "Oregon": "Salem",
+      "Pennsylvania": "Harrisburg",
+      "Rhode Island": "Providence",
+      "South Carolina": "Columbia",
+      "South Dakota": "Pierre",
+      "Tennessee": "Nashville",
+      "Texas": "Austin",
+      "Utah": "Salt Lake City",
+      "Vermont": "Montpelier",
+      "Virginia": "Richmond",
+      "Washington": "Olympia",
+      "West Virginia": "Charleston",
+      "Wisconsin": "Madison",
+      "Wyoming": "Cheyenne"
+    }; // Full set of state-capital pairs
+  
+    let firstCard = null;
+    let secondCard = null;
+    let matchedPairs = 0;
+    let currentLevel = 1; // Start at level 1
+  
+    const cards = document.querySelectorAll(".card");
+  
+    // Shuffle an array
+    function shuffle(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
     }
-}
-
-// Check for Match
-function checkForMatch() {
-    const [card1, card2] = flippedCards;
-    if (card1.dataset.value === card2.dataset.value) {
-        matchedPairs++;
-        flippedCards = [];
-        if (matchedPairs === cardValues.length / 2) {
-            alert("You win!");
+  
+    // Randomize card values for the current level
+    function setupCards() {
+      const states = Object.keys(allPairs);
+      const capitals = Object.values(allPairs);
+  
+      // Extract random pairs equal to the number of cards divided by 2
+      const numPairs = cards.length / 2;
+      const selectedPairs = [];
+  
+      // Randomly select state-capital pairs for the level
+      while (selectedPairs.length < numPairs * 2) { 
+        const randomIndex = Math.floor(Math.random() * states.length);
+        const state = states[randomIndex];
+        const capital = allPairs[state]; // Get the corresponding capital for the state
+  
+        // Add state and capital to the selected pairs if not already added
+        if (!selectedPairs.includes(state) && !selectedPairs.includes(capital)) {
+          selectedPairs.push(state, capital); // Add state and its capital
         }
-    } else {
-        setTimeout(() => {
-            card1.textContent = '';
-            card2.textContent = '';
-            flippedCards = [];
-        }, 1000);
+      }
+  
+      // Shuffle the selected pairs
+      shuffle(selectedPairs);
+  
+      // Assign randomized values to cards
+      cards.forEach((card, index) => {
+        card.dataset.value = selectedPairs[index];
+        card.textContent = "?"; // Hide card values
+        card.classList.remove("matched", "correct", "wrong"); // Reset card states
+        card.addEventListener("click", handleCardClick);
+      });
     }
-}
+  
+    // Handle card click
+    function handleCardClick(e) {
+      const clickedCard = e.target;
+  
+      // Prevent clicking the same card twice or clicking more than two cards
+      if (clickedCard === firstCard || clickedCard.classList.contains("matched") || secondCard) return;
+  
+      clickedCard.textContent = clickedCard.dataset.value; // Reveal card value
+  
+      if (!firstCard) {
+        firstCard = clickedCard; // Set the first card
+      } else {
+        secondCard = clickedCard; // Set the second card
+        checkMatch();
+      }
+    }
+  
+    // Check if the cards match
+    function checkMatch() {
+      const isMatch =
+        allPairs[firstCard.dataset.value] === secondCard.dataset.value ||
+        allPairs[secondCard.dataset.value] === firstCard.dataset.value;
+  
+      if (isMatch) {
+        // Match found
+        firstCard.classList.add("matched", "correct");
+        secondCard.classList.add("matched", "correct");
+        matchedPairs++;
+  
+        resetCards();
+  
+        // Check if all pairs are matched
+        if (matchedPairs === cards.length / 2) {
+          setTimeout(() => {
+            alert(`Congratulations! Moving to Level ${currentLevel + 1}!`);
+            
+            // Redirect to the next level 
+            if (currentLevel <= 10) {
+              window.location.href = `classic${currentLevel + 1}.html`;
+            } else {
+              alert("You've completed all levels!");
+            }
+          }, 500);
+        }
+      } else {
+        // No match
+        firstCard.classList.add("wrong");
+        secondCard.classList.add("wrong");
+        setTimeout(() => {
+          firstCard.textContent = "?";
+          secondCard.textContent = "?";
+          firstCard.classList.remove("wrong");
+          secondCard.classList.remove("wrong");
+          resetCards();
+        }, 1000);
+      }
+    }
+  
+    // Reset selected cards
+    function resetCards() {
+      firstCard = null;
+      secondCard = null;
+    }
+  
+    // Initialize the game for the current level
+    setupCards();
+  });
+  
