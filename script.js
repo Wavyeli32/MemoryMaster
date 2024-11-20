@@ -131,20 +131,30 @@ document.addEventListener("DOMContentLoaded", () => {
   
         resetCards();
   
-        // Check if all pairs are matched
-        if (matchedPairs === cards.length / 2) {
-          setTimeout(() => {
-            alert(`Congratulations! Moving to Level ${currentLevel + 1}!`);
-            
-            // Redirect to the next level 
-            if (currentLevel <= 10) {
-              window.location.href = `classic${currentLevel + 1}.html`;
-            } else {
-              alert("You've completed all levels!");
-            }
-          }, 500);
-        }
-      } else {
+        // Initialize currentLevel
+let currentLevel = parseInt(localStorage.getItem("currentLevel")) || 1;
+
+// Game logic
+if (matchedPairs === cards.length / 2) {
+  setTimeout(() => {
+    alert(`Congratulations! Moving to Level ${currentLevel + 1}!`);
+    
+    // Increment and store the updated level
+    currentLevel++;
+    localStorage.setItem("currentLevel", currentLevel);
+
+    // Redirect to the next level
+    if (currentLevel <= 10) {
+      window.location.href = `classic${currentLevel}.html`;
+    } else {
+      alert("You've completed all levels!");
+      localStorage.removeItem("currentLevel"); // Clear the level progress
+    }
+  }, 500);
+}
+      }
+
+        else {
         // No match
         firstCard.classList.add("wrong");
         secondCard.classList.add("wrong");
