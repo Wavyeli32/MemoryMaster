@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Time Trial Mode</title>
   <link rel="stylesheet" href="style.css">
+  <script src="script2.js"></script>
 </head>
 <body>
   <div class="container">
@@ -13,9 +14,10 @@
       Match all the pairs before the time runs out!
     </p>
     
-    <!-- Timer Section -->
-    <div class="timer">
-      Time Remaining: <span id="time-remaining">60</span> seconds
+  
+    <div id="game-info">
+      <span id="score">Score: 0</span>
+      <span id="timer">Time: 150s</span>
     </div>
     
     <!-- Game Board -->
@@ -25,18 +27,10 @@
       <div class="card">?</div>
       <div class="card">?</div>
       <div class="card">?</div>
-      <div class="card">?</div>
-      <div class="card">?</div>
-      <div class="card">?</div>
-      <div class="card">?</div>
     </div>
     
     <button class="back-button" onclick="location.href='select-mode.html'">Back to Select Mode</button>
   </div>
   
-  <script>
-    // JavaScript for the timer
-  
-  </script>
 </body>
 </html>

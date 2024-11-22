@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Score Summary</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      margin-top: 50px;
+    }
+    .score-summary {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      margin-top: 20px;
+      cursor: pointer;
+      background-color: #28a745;
+      color: white;
+      border: none;
+      border-radius: 4px;
+    }
+    button:hover {
+      background-color: #218838;
+    }
+  </style>
+</head>
+<body>
+  <div class="score-summary">
+    <h1>Level Complete!</h1>
+    <p id="score-breakdown"></p>
+    <button id="next-level-btn">Next Level</button>
+  </div>
+
+  <script>
+    // Retrieve score data from localStorage
+    const currentLevel = parseInt(localStorage.getItem("currentLevel"));
+    const nextLevel = parseInt(localStorage.getItem("nextLevel"));
+    const levelBonus = parseInt(localStorage.getItem("levelBonus"));
+    const matchedPairs = parseInt(localStorage.getItem("matchedPairs"));
+    const totalPairs = parseInt(localStorage.getItem("totalPairs"));
+    const score = parseInt(localStorage.getItem("score"));
+
+    // Calculate total score for this level
+    const levelScore = levelBonus + matchedPairs * 10; 
+
+    // Display the breakdown
+    document.getElementById("score-breakdown").innerHTML = `
+      <p>Level: ${currentLevel}</p>
+      <p>Matched Pairs: ${matchedPairs} / ${totalPairs}</p>
+      <p>Level Bonus: ${levelBonus}</p>
+      <p>Total Score: ${score} + ${levelScore} = ${score + levelScore}</p>
+    `;
+
+    // Update score for the next level
+    localStorage.setItem("score", score + levelScore);
+
+    // Next Level Button
+    document.getElementById("next-level-btn").addEventListener("click", () => {
+      if (nextLevel <= 10) {
+        window.location.href = `classic${nextLevel}.html`;
+      } else {
+        alert("Congratulations! You've completed all levels!");
+        localStorage.clear(); // Reset progress
+        window.location.href = "index.html"; // Redirect to home page
+      }
+    });
+  </script>
+</body>
+</html>
