@@ -56,10 +56,21 @@ document.addEventListener("DOMContentLoaded", () => {
   let secondCard = null;
   let matchedPairs = 0;
   let currentLevel = parseInt(localStorage.getItem("currentLevel")) || 1;
-  let score = parseInt(localStorage.getItem("score")) || 0; // Initialize score from localStorage
+  let score = parseInt(localStorage.getItem("score")) || 0;
+  let timeLeft = calculateTimeLeft(currentLevel);
+  let timer; // Global timer variable
+  let gamePaused = false; // Track if the game is paused
 
   const cards = document.querySelectorAll(".card");
-  const scoreDisplay = document.querySelector("#score"); // Assuming you have a score display element
+  const scoreDisplay = document.querySelector("#score");
+  const timerDisplay = document.querySelector("#timer");
+  const pauseMenu = document.getElementById('pauseMenu'); // Pause menu
+
+  function calculateTimeLeft(level) {
+    const initialTime = 150; 
+    const timeReductionPerLevel = 10; 
+    return Math.max(initialTime - (level - 1) * timeReductionPerLevel, 30); 
+  }
 
   function updateScoreDisplay() {
     if (scoreDisplay) {
@@ -67,7 +78,52 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Shuffle an array
+  function updateTimerDisplay() {
+    if (timerDisplay) {
+      timerDisplay.textContent = `Time: ${timeLeft}s`;
+    }
+  }
+
+  function startTimer() {
+    updateTimerDisplay();
+    timer = setInterval(() => {
+      if (!gamePaused) {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          endGame("Time's up! Try again.");
+        }
+      }
+    }, 1000);
+  }
+
+  const gameBoard = document.querySelector(".game-board");
+
+  function pauseGame() {
+    gamePaused = true;
+    clearInterval(timer);
+    gameBoard.style.visibility = "hidden"; // Hide without changing layout
+    pauseMenu.style.display = "block";
+  }
+  
+  function resumeGame() {
+    gamePaused = false;
+    startTimer();
+    gameBoard.style.visibility = "visible"; // Restore visibility
+    pauseMenu.style.display = "none";
+  }
+  
+
+  function saveProgress() {
+    localStorage.setItem('gameProgress', JSON.stringify({ level: currentLevel, score: score }));
+    alert("Game progress saved!");
+  }
+
+  function returnToSelectMode() {
+    alert("Returning to Select Mode.");
+    window.location.href = "select-mode.html"; 
+  }
+
   function shuffle(array) {
     for (let i = array.length - 1; i > 0; i--) {
       const j = Math.floor(Math.random() * (i + 1));
@@ -101,6 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleCardClick(e) {
+    if (gamePaused) return; // Disable interaction when paused
+
     const clickedCard = e.target;
     if (clickedCard === firstCard || clickedCard.classList.contains("matched") || secondCard) return;
 
@@ -123,17 +181,19 @@ document.addEventListener("DOMContentLoaded", () => {
       firstCard.classList.add("matched", "correct");
       secondCard.classList.add("matched", "correct");
       matchedPairs++;
-      score += 10; 
+      score += 10;
       localStorage.setItem("score", score);
       updateScoreDisplay();
 
       resetCards();
 
       if (matchedPairs === cards.length / 2) {
+        clearInterval(timer);
         setTimeout(() => {
-          alert(`Congratulations! Moving to Level ${currentLevel + 1}!`);
+          alert(`Level ${currentLevel} completed!`);
           currentLevel++;
           localStorage.setItem("currentLevel", currentLevel);
+          timeLeft = calculateTimeLeft(currentLevel); 
           window.location.href = `classic${currentLevel}.html`;
         }, 500);
       }
@@ -147,7 +207,7 @@ document.addEventListener("DOMContentLoaded", () => {
         secondCard.classList.remove("wrong");
         resetCards();
       }, 1000);
-      score -= 5; // Decrease score for an incorrect guess
+      score -= 5;
       localStorage.setItem("score", score);
       updateScoreDisplay();
     }
@@ -158,7 +218,21 @@ document.addEventListener("DOMContentLoaded", () => {
     secondCard = null;
   }
 
-  updateScoreDisplay(); // Display initial score
-  setupCards();
-});
+  function endGame(message) {
+    clearInterval(timer);
+    alert(`${message} Final Score: ${score}`);
+    localStorage.setItem("currentLevel", 1);
+    localStorage.setItem("score", 0);
+    window.location.href = "score.html"; 
+  }
 
+  window.pauseGame = pauseGame;
+  window.resumeGame = resumeGame;
+  window.saveProgress = saveProgress;
+  window.returnToSelectMode = returnToSelectMode;
+
+  // Game initialization
+  updateScoreDisplay();
+  setupCards();
+  startTimer();
+});

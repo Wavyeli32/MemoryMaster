@@ -65,6 +65,7 @@
     localStorage.setItem("score", newScore);
     localStorage.setItem("currentLevel", nextLevel);
 
+    // Handle the Next Level button click
     document.getElementById("next-level-btn").addEventListener("click", () => {
     // End of game: clear progress and return to the main menu
     localStorage.clear(); // Reset progress

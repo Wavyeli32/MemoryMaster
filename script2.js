@@ -58,11 +58,13 @@ document.addEventListener("DOMContentLoaded", () => {
   let currentLevel = parseInt(localStorage.getItem("currentLevel")) || 1;
   let score = parseInt(localStorage.getItem("score")) || 0;
   let timeLeft = calculateTimeLeft(currentLevel);
-  let timer;
+  let timer; // Global timer variable
+  let gamePaused = false; // Track if the game is paused
 
   const cards = document.querySelectorAll(".card");
   const scoreDisplay = document.querySelector("#score");
   const timerDisplay = document.querySelector("#timer");
+  const pauseMenu = document.getElementById('pauseMenu'); // Pause menu
 
   function calculateTimeLeft(level) {
     const initialTime = 150; 
@@ -85,12 +87,41 @@ document.addEventListener("DOMContentLoaded", () => {
   function startTimer() {
     updateTimerDisplay();
     timer = setInterval(() => {
-      timeLeft--;
-      updateTimerDisplay();
-      if (timeLeft <= 0) {
-        endGame("Time's up! Try again.");
+      if (!gamePaused) {
+        timeLeft--;
+        updateTimerDisplay();
+        if (timeLeft <= 0) {
+          endGame("Time's up! Try again.");
+        }
       }
     }, 1000);
+  }
+
+  const gameBoard = document.querySelector(".game-board");
+
+  function pauseGame() {
+    gamePaused = true;
+    clearInterval(timer);
+    gameBoard.style.visibility = "hidden"; // Hide without changing layout
+    pauseMenu.style.display = "block";
+  }
+  
+  function resumeGame() {
+    gamePaused = false;
+    startTimer();
+    gameBoard.style.visibility = "visible"; // Restore visibility
+    pauseMenu.style.display = "none";
+  }
+  
+
+  function saveProgress() {
+    localStorage.setItem('gameProgress', JSON.stringify({ level: currentLevel, score: score }));
+    alert("Game progress saved!");
+  }
+
+  function returnToSelectMode() {
+    alert("Returning to Select Mode.");
+    window.location.href = "select-mode.html"; 
   }
 
   function shuffle(array) {
@@ -126,6 +157,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function handleCardClick(e) {
+    if (gamePaused) return; // Disable interaction when paused
+
     const clickedCard = e.target;
     if (clickedCard === firstCard || clickedCard.classList.contains("matched") || secondCard) return;
 
@@ -193,6 +226,12 @@ document.addEventListener("DOMContentLoaded", () => {
     window.location.href = "score.html"; 
   }
 
+  window.pauseGame = pauseGame;
+  window.resumeGame = resumeGame;
+  window.saveProgress = saveProgress;
+  window.returnToSelectMode = returnToSelectMode;
+
+  // Game initialization
   updateScoreDisplay();
   setupCards();
   startTimer();
